@@ -1,0 +1,133 @@
+
+package com.mycompany.firstproject;
+
+/**
+ *
+ * @author PC
+ */
+public class Task {
+    String description;
+    boolean isdone;
+    
+    Task ( String description){
+        this.description = description;
+        this.isdone = false;
+    }
+    @Override
+    public String toString(){
+        return (isdone ? "[Done]" : "[UnDone]")+description;
+    }
+    
+}
+
+
+
+
+package com.mycompany.firstproject;
+
+import java.util.Scanner;
+import java.util.ArrayList;
+
+/**
+ *
+ * @author PC
+ */
+
+public class Firstproject {
+    
+    private static ArrayList<Task> tasks = new ArrayList<>();
+    
+    public static void main(String[] args) {
+        Scanner scanner  = new Scanner (System.in);
+        int choice;
+        
+        do{
+            System.out.println("--- To Do List ---");
+            System.out.println ( " 1- Add Task");
+            System.out.println ( " 2- View Task");
+            System.out.println ( " 3- Mark Task as Done");
+            System.out.println( " 4- Delete Task");
+            System.out.println( " 0- Exit Program");
+            System.out.println ( "Enter your Choice: ");
+            choice = scanner.nextInt();
+            scanner.nextLine();
+            
+            switch(choice){
+                case 1:
+                    addTask(scanner);
+                    break;
+                    
+                case 2:
+                    viewTasks();
+                    break;
+                case 3:
+                    MarkTask(scanner);
+                    break;
+                case 4:
+                    deleteTask(scanner);
+                    break;
+                case 0:
+                    System.out.println ( " GoodBye");
+                    break;
+                
+                default:
+                    System.out.println("Invalid choice");
+            }
+            
+        } while(choice != 0);
+    }
+    
+    private static void addTask(Scanner scanner){
+        System.out.println("Enter Task: ");
+        String description = scanner.nextLine();
+        tasks.add(new Task(description));
+        System.out.println( " Task Added");
+        
+        
+    }
+    
+    private static void viewTasks(){
+        if(tasks.isEmpty()){
+            System.out.println("No Tasks found");
+        }else{
+            for ( int i = 0 ; i < tasks.size() ; i++){
+                System.out.println((i+1) + "." + tasks.get(i));
+            }
+        }
+        
+    }
+    
+    private static void MarkTask(Scanner scanner){
+        viewTasks();
+        if(tasks.isEmpty())return;
+        
+        System.out.println( " Enter Task number to mark done: ");
+        int number = scanner.nextInt();
+        scanner.nextLine();
+        if( number > 0 && number <= tasks.size()){
+            tasks.get(number - 1).isdone = true;
+            System.out.println(" Task Marked done successfully");
+        }else{
+           System.out.println("Invalid task number");
+        }
+    }
+    
+    private static void deleteTask(Scanner scanner){
+        viewTasks();
+        if(tasks.isEmpty())return;
+        
+        System.out.println( " Enter Task number to Delete: ");
+        
+        int number = scanner.nextInt();
+        scanner.nextLine();
+        
+        if(number > 0 && number <= tasks.size()){
+          tasks.remove(number - 1 );
+          System.out.println( "Task Deleted Successfully");
+        }else{
+            System.out.println("Invalid Number");
+        }
+        
+    }
+    
+}
