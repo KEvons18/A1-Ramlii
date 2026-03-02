@@ -1,0 +1,319 @@
+// LibrarySystem.java - Complete Library Book System in a Single File
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+import java.util.stream.Collectors;
+
+// ==================== BOOK CLASS ====================
+class Book {
+    private String title;
+    private String author;
+    private String isbn;
+    
+    // Constructor
+    public Book(String title, String author, String isbn) {
+        this.title = title;
+        this.author = author;
+        this.isbn = isbn;
+    }
+    
+    // Getters
+    public String getTitle() {
+        return title;
+    }
+    
+    public String getAuthor() {
+        return author;
+    }
+    
+    public String getIsbn() {
+        return isbn;
+    }
+    
+    // Setters
+    public void setTitle(String title) {
+        this.title = title;
+    }
+    
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+    
+    public void setIsbn(String isbn) {
+        this.isbn = isbn;
+    }
+    
+    @Override
+    public String toString() {
+        return String.format("Title: %s | Author: %s | ISBN: %s", 
+                            title, author, isbn);
+    }
+}
+
+// ==================== LIBRARY CLASS ====================
+class Library {
+    private String name;
+    private ArrayList<Book> books;
+    
+    public Library(String name) {
+        this.name = name;
+        this.books = new ArrayList<>();
+    }
+    
+    public void addBook(Book book) {
+        books.add(book);
+        System.out.println("Added: " + book.getTitle());
+    }
+    
+    public boolean removeBook(String isbn) {
+        for (int i = 0; i < books.size(); i++) {
+            if (books.get(i).getIsbn().equals(isbn)) {
+                Book removed = books.remove(i);
+                System.out.println("Removed: " + removed.getTitle());
+                return true;
+            }
+        }
+        System.out.println("Book with ISBN " + isbn + " not found.");
+        return false;
+    }
+    
+    public boolean editBook(String isbn, String newTitle, String newAuthor, String newIsbn) {
+        Book book = searchByIsbn(isbn);
+        if (book != null) {
+            if (!newTitle.isEmpty()) {
+                book.setTitle(newTitle);
+            }
+            if (!newAuthor.isEmpty()) {
+                book.setAuthor(newAuthor);
+            }
+            if (!newIsbn.isEmpty()) {
+                Book existingBook = searchByIsbn(newIsbn);
+                if (existingBook != null && !existingBook.equals(book)) {
+                    System.out.println("Error: Another book with ISBN " + newIsbn + " already exists.");
+                    return false;
+                }
+                book.setIsbn(newIsbn);
+            }
+            System.out.println("Book updated successfully: " + book.getTitle());
+            return true;
+        }
+        System.out.println("Book with ISBN " + isbn + " not found.");
+        return false;
+    }
+    
+    public List<Book> searchByTitle(String titleQuery) {
+        return books.stream()
+                .filter(book -> book.getTitle().toLowerCase()
+                        .contains(titleQuery.toLowerCase()))
+                .collect(Collectors.toList());
+    }
+    
+    public List<Book> searchByAuthor(String authorQuery) {
+        return books.stream()
+                .filter(book -> book.getAuthor().toLowerCase()
+                        .contains(authorQuery.toLowerCase()))
+                .collect(Collectors.toList());
+    }
+    
+    public Book searchByIsbn(String isbn) {
+        for (Book book : books) {
+            if (book.getIsbn().equals(isbn)) {
+                return book;
+            }
+        }
+        return null;
+    }
+    
+    public void displayAllBooks() {
+        if (books.isEmpty()) {
+            System.out.println("\nThe library has no books.");
+            return;
+        }
+        
+        System.out.println("\n=== " + name + " - All Books (" + books.size() + ") ===");
+        for (int i = 0; i < books.size(); i++) {
+            System.out.println((i + 1) + ". " + books.get(i));
+        }
+        System.out.println("=============================\n");
+    }
+    
+    public int getTotalBooks() {
+        return books.size();
+    }
+    
+    public String getName() {
+        return name;
+    }
+}
+
+// ==================== MAIN CLASS ====================
+public class LibrarySystem {
+    private static Scanner scanner = new Scanner(System.in);
+    private static Library library;
+    
+    public static void main(String[] args) {
+        System.out.println("=== Welcome to the Library Management System ===");
+        System.out.print("Enter library name: ");
+        String libName = scanner.nextLine();
+        
+        library = new Library(libName);
+        
+        // Add some sample books
+        addSampleBooks();
+        
+        boolean running = true;
+        
+        while (running) {
+            displayMenu();
+            int choice = getUserChoice();
+            
+            switch (choice) {
+                case 1:
+                    addBook();
+                    break;
+                case 2:
+                    removeBook();
+                    break;
+                case 3:
+                    editBook();
+                    break;
+                case 4:
+                    searchBooks();
+                    break;
+                case 5:
+                    library.displayAllBooks();
+                    break;
+                case 6:
+                    running = false;
+                    System.out.println("Thank you for using the Library System!");
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+        
+        scanner.close();
+    }
+    
+    private static void displayMenu() {
+        System.out.println("\n=== " + library.getName() + " Menu ===");
+        System.out.println("1. Add a book");
+        System.out.println("2. Remove a book");
+        System.out.println("3. Edit a book");
+        System.out.println("4. Search for books");
+        System.out.println("5. Display all books");
+        System.out.println("6. Exit");
+        System.out.print("Enter your choice (1-6): ");
+    }
+    
+    private static int getUserChoice() {
+        try {
+            return Integer.parseInt(scanner.nextLine());
+        } catch (NumberFormatException e) {
+            return -1;
+        }
+    }
+    
+    private static void addSampleBooks() {
+        library.addBook(new Book("The Great Gatsby", "F. Scott Fitzgerald", "978-0-7432-7356-5"));
+        library.addBook(new Book("To Kill a Mockingbird", "Harper Lee", "978-0-06-112008-4"));
+        library.addBook(new Book("1984", "George Orwell", "978-0-452-28423-4"));
+        library.addBook(new Book("Pride and Prejudice", "Jane Austen", "978-0-14-143951-8"));
+        library.addBook(new Book("The Catcher in the Rye", "J.D. Salinger", "978-0-316-76948-0"));
+        System.out.println("\nSample books added to the library!");
+    }
+    
+    private static void addBook() {
+        System.out.println("\n--- Add a New Book ---");
+        System.out.print("Enter title: ");
+        String title = scanner.nextLine();
+        System.out.print("Enter author: ");
+        String author = scanner.nextLine();
+        System.out.print("Enter ISBN: ");
+        String isbn = scanner.nextLine();
+        
+        Book book = new Book(title, author, isbn);
+        library.addBook(book);
+    }
+    
+    private static void removeBook() {
+        System.out.println("\n--- Remove a Book ---");
+        library.displayAllBooks();
+        System.out.print("Enter ISBN of book to remove: ");
+        String isbn = scanner.nextLine();
+        library.removeBook(isbn);
+    }
+    
+    private static void editBook() {
+        System.out.println("\n--- Edit a Book ---");
+        library.displayAllBooks();
+        System.out.print("Enter ISBN of book to edit: ");
+        String isbn = scanner.nextLine();
+        
+        Book existingBook = library.searchByIsbn(isbn);
+        if (existingBook == null) {
+            System.out.println("Book with ISBN " + isbn + " not found.");
+            return;
+        }
+        
+        System.out.println("\nEditing: " + existingBook);
+        System.out.println("(Press Enter to keep current value)");
+        
+        System.out.print("New title [" + existingBook.getTitle() + "]: ");
+        String newTitle = scanner.nextLine();
+        
+        System.out.print("New author [" + existingBook.getAuthor() + "]: ");
+        String newAuthor = scanner.nextLine();
+        
+        System.out.print("New ISBN [" + existingBook.getIsbn() + "]: ");
+        String newIsbn = scanner.nextLine();
+        
+        library.editBook(isbn, newTitle, newAuthor, newIsbn);
+    }
+    
+    private static void searchBooks() {
+        System.out.println("\n--- Search Books ---");
+        System.out.println("Search by: 1. Title  2. Author  3. ISBN");
+        System.out.print("Enter choice: ");
+        String choice = scanner.nextLine();
+        
+        switch (choice) {
+            case "1":
+                System.out.print("Enter title to search: ");
+                String title = scanner.nextLine();
+                List<Book> titleResults = library.searchByTitle(title);
+                displaySearchResults(titleResults);
+                break;
+            case "2":
+                System.out.print("Enter author to search: ");
+                String author = scanner.nextLine();
+                List<Book> authorResults = library.searchByAuthor(author);
+                displaySearchResults(authorResults);
+                break;
+            case "3":
+                System.out.print("Enter ISBN to search: ");
+                String isbn = scanner.nextLine();
+                Book book = library.searchByIsbn(isbn);
+                if (book != null) {
+                    System.out.println("Found: " + book);
+                } else {
+                    System.out.println("No book found with ISBN: " + isbn);
+                }
+                break;
+            default:
+                System.out.println("Invalid search option.");
+        }
+    }
+    
+    private static void displaySearchResults(List<Book> results) {
+        if (results.isEmpty()) {
+            System.out.println("No books found matching your search.");
+        } else {
+            System.out.println("\nFound " + results.size() + " book(s):");
+            for (int i = 0; i < results.size(); i++) {
+                System.out.println((i + 1) + ". " + results.get(i));
+            }
+        }
+    }
+}
